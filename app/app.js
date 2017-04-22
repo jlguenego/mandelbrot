@@ -4,24 +4,26 @@
 	var width = 400;
 	var height = 400;
 
+	var step = 400;
+
 	function main() {
 		var c = document.getElementById('myCanvas');
 		var ctx = c.getContext('2d');
 
 		var xStart = -2;
 		var xEnd = 2;
-		var xStep = 10;
+		var xStep = step;
 
 		var yStart = -2;
 		var yEnd = 2;
-		var yStep = 10;
+		var yStep = step;
 
 		function scaleX(x) {
-			return (x + 2) * 250;
+			return (x - xStart) * width/(xEnd-xStart);
 		}
 
 		function scaleY(y) {
-			return (y + 2) * 250;
+			return (y - yStart) * width/(yEnd-yStart);
 		}
 		var pixelX = width / xStep;
 		var pixelY = height / yStep;
@@ -44,7 +46,7 @@
 				ctx.fillStyle = color;
 
 				ctx.fillRect(scaleX(x), scaleY(y), pixelX, pixelY);
-				console.log('done for', i, j, x, y, scaleX(x), scaleY(y), color);
+				//console.log('done for', i, j, x, y, scaleX(x), scaleY(y), color);
 			}
 
 		}
@@ -71,7 +73,6 @@
 
 		constructor(z) {
 			this.z = z;
-			this.index = 0;
 			this.current = new Complex(0, 0);
 		}
 
@@ -80,14 +81,15 @@
 		}
 
 		getColor() {
-			var max = 200;
+			var max = 20;
 			for (var i = 0; i < max; i++) {
 				this.increment();
 				if (this.current.module() > 2) {
 					return 0;
 				}
-				return 1;
+				
 			}
+			return 1;
 		}
 
 	}
