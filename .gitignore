@@ -1,5 +1,2 @@
 node_modules/
-app/wpk/
-cfg/environments.js
-dist/
-*.zip
+jspm_packages/

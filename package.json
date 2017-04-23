@@ -11,6 +11,16 @@
   "license": "ISC",
   "devDependencies": {
     "eslint": "3.19.0",
-    "eslint-config-google": "0.7.1"
+    "eslint-config-google": "0.7.1",
+    "jspm": "0.16.53",
+    "systemjs": "0.20.12"
+  },
+  "jspm": {
+    "configFile": "jspm.config.js",
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4"
+    }
   }
 }
