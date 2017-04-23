@@ -9,13 +9,44 @@ import 'angular';
 var app = angular.module('main', []);
 app.run(function($rootScope) {
 	'ngInject';
-	$rootScope.width = $(window).width();
-	$rootScope.height = $(window).height() - $('h1').height();
-	$rootScope.step = 600;
-	$rootScope.max = 50;
+	var s = {
+		xStart: -2,
+		xEnd: 2,
+		yCenter: 0,
+		width: $(window).width(),
+		height: $(window).height() - 100,
+		step: 400,
+		max: 50
+	};
+	s.xWidth = s.xEnd - s.xStart;
+	s.yStart = s.yCenter - 0.5 * s.xWidth * s.height / s.width;
+	s.yEnd = s.yCenter + 0.5 * s.xWidth * s.height / s.width;
+	s.yHeight = s.yEnd - s.yStart;
+
+	console.log('$(h1).height()', $('h1').height());
+	$rootScope.s = s;
+	console.log('$rootScope.s', $rootScope.s.width);
 	setTimeout(() => {
-		main($rootScope);
+		main(s);
 	}, 0);
+
+	$('canvas').bind('mousewheel', function(e) {
+		e.preventDefault();
+		console.log('wheel event', arguments);
+		if (e.originalEvent.wheelDelta / 120 > 0) {
+			console.log('wheel event up: zoom out', e.offsetX, e.offsetY);
+			zoom(s, e, 1);
+		} else {
+			console.log('wheel event down: zoom in');
+			zoom(s, e, -1);
+		}
+		main(s);
+
+	});
+
+	$rootScope.$watch('s', function() {
+		main(s);
+	}, true);
 
 });
 
@@ -25,58 +56,47 @@ angular.element(() => {
 
 
 
-function main($rootScope) {
-	var width = $rootScope.width;
-	var height = $rootScope.height;
-	var step = $rootScope.step;
-	var max = $rootScope.max;
-
-	console.log('width', width);
-	console.log('height', height);
+function main(s) {
+	console.log('width', s.width);
+	console.log('height', s.height);
 	var c = document.getElementById('myCanvas');
 	var ctx = c.getContext('2d');
-	c.width = width;
-	c.height = height;
-
-	var xStart = -2;
-	var xEnd = 2;
-	var xStep = step;
-
-	var xWidth = xEnd - xStart;
-
-	var yCenter = 0;
-	var yStart = yCenter - 0.5 * xWidth * height / width;
-	var yEnd = yCenter + 0.5 * xWidth * height / width;
-	var yStep = step;
+	ctx.clearRect(0, 0, c.width, c.height);
 
 
-	var yHeight = yEnd - yStart;
+	
+
+	var xStep = s.step;
+	var yStep = s.step;
+
+
+	
 
 	function scaleX(x) {
-		return Math.ceil((x - xStart) * width / xWidth);
+		return Math.ceil((x - s.xStart) * s.width / s.xWidth);
 	}
 
 	function scaleY(y) {
-		return Math.ceil((y - yStart) * height / yHeight);
+		return Math.ceil((y - s.yStart) * s.height / s.yHeight);
 	}
 
-	var pixelX = Math.ceil(width / xStep);
-	var pixelY = Math.ceil(height / yStep);
+	var pixelX = Math.ceil(s.width / xStep);
+	var pixelY = Math.ceil(s.height / yStep);
 
 	for (var i = 0; i < xStep; i++) {
 		for (var j = 0; j < yStep; j++) {
 
-			var x = xStart + i * (xEnd - xStart) / xStep;
-			var y = yStart + j * (yEnd - yStart) / yStep;
+			var x = s.xStart + i * (s.xEnd - s.xStart) / xStep;
+			var y = s.yStart + j * (s.yEnd - s.yStart) / yStep;
 			var z = new Complex(x, y);
-			var suite = new Suite(z, max);
+			var suite = new Suite(z, s.max);
 			var type = suite.getType();
 
 			var color = 'white';
 			if (type === -1) {
 				color = 'black';
 			} else {
-				color = 'hsla(' + Math.ceil(type * 360/max) + ', 100%, 50%, 1)';
+				color = 'hsla(' + Math.ceil(type * 360 / s.max) + ', 100%, 50%, 1)';
 			}
 			ctx.fillStyle = color;
 
@@ -88,3 +108,27 @@ function main($rootScope) {
 	ctx.stroke();
 	console.log('canva done');
 };
+
+function zoom(s, e, coef) {
+
+	var c;
+	if (coef === -1) {
+		c = 0.5;
+	} else {
+		c = 2;
+	}
+	var xR = e.offsetX / s.width;
+	var yR = e.offsetY / s.height;
+	var x = s.xStart + xR * s.xWidth;
+	var y = s.yStart + yR * s.yHeight;
+
+	s.xWidth *= c;
+	s.yHeight *= c;
+
+	s.xStart = x - xR * s.xWidth;
+	s.yStart = y - yR * s.yHeight;
+
+	s.xEnd = s.xStart + s.xWidth;
+	s.yEnd = s.yStart + s.yHeight;
+
+}
