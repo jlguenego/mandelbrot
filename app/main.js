@@ -12,23 +12,20 @@ app.run(function($rootScope) {
 	var s = {
 		xStart: -2,
 		xEnd: 2,
-		yCenter: 0,
 		width: $(window).width(),
 		height: $(window).height() - 100,
 		step: 400,
 		max: 50
 	};
 	s.xWidth = s.xEnd - s.xStart;
-	s.yStart = s.yCenter - 0.5 * s.xWidth * s.height / s.width;
-	s.yEnd = s.yCenter + 0.5 * s.xWidth * s.height / s.width;
+	s.yStart = -0.5 * s.xWidth * s.height / s.width;
+	s.yEnd = 0.5 * s.xWidth * s.height / s.width;
 	s.yHeight = s.yEnd - s.yStart;
 
 	console.log('$(h1).height()', $('h1').height());
 	$rootScope.s = s;
 	console.log('$rootScope.s', $rootScope.s.width);
-	setTimeout(() => {
-		main(s);
-	}, 0);
+
 
 	$('canvas').bind('mousewheel', function(e) {
 		e.preventDefault();
@@ -45,7 +42,9 @@ app.run(function($rootScope) {
 	});
 
 	$rootScope.$watch('s', function() {
-		main(s);
+		setTimeout(() => {
+			main(s);
+		}, 0);
 	}, true);
 
 });
@@ -64,13 +63,13 @@ function main(s) {
 	ctx.clearRect(0, 0, c.width, c.height);
 
 
-	
+
 
 	var xStep = s.step;
 	var yStep = s.step;
 
 
-	
+
 
 	function scaleX(x) {
 		return Math.ceil((x - s.xStart) * s.width / s.xWidth);
