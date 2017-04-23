@@ -53,11 +53,11 @@ function main($rootScope) {
 	var yHeight = yEnd - yStart;
 
 	function scaleX(x) {
-		return (x - xStart) * width / xWidth;
+		return Math.ceil((x - xStart) * width / xWidth);
 	}
 
 	function scaleY(y) {
-		return (y - yStart) * height / yHeight;
+		return Math.ceil((y - yStart) * height / yHeight);
 	}
 
 	var pixelX = Math.ceil(width / xStep);
