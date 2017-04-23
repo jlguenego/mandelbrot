@@ -4,8 +4,9 @@ import Complex from './Complex.js';
 
 export default class Suite {
 
-	constructor(z) {
+	constructor(z, max) {
 		this.z = z;
+		this.max = max;
 		this.current = new Complex(0, 0);
 	}
 
@@ -13,17 +14,15 @@ export default class Suite {
 		this.current = Complex.add(this.z, Complex.multiply(this.current, this.current));
 	}
 
-	getColor() {
-		var max = 20;
-		for (var i = 0; i < max; i++) {
+	getType() {
+		for (var i = 0; i < this.max; i++) {
 			this.increment();
 			if (this.current.module() > 2) {
-				return 0;
+				return i;
 			}
 
 		}
-		return 1;
+		return -1;
 	}
 
-}
-
+};

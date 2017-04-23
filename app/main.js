@@ -3,32 +3,65 @@
 import Complex from './Complex.js';
 import Suite from './Suite.js';
 
-var width = 400;
-var height = 400;
+import 'jquery';
+import 'angular';
 
-var step = 400;
+var app = angular.module('main', []);
+app.run(function($rootScope) {
+	'ngInject';
+	$rootScope.width = $(window).width();
+	$rootScope.height = $(window).height() - $('h1').height();
+	$rootScope.step = 600;
+	$rootScope.max = 50;
+	setTimeout(() => {
+		main($rootScope);
+	}, 0);
 
-function main() {
+});
+
+angular.element(() => {
+	angular.bootstrap(document, ['main']);
+});
+
+
+
+function main($rootScope) {
+	var width = $rootScope.width;
+	var height = $rootScope.height;
+	var step = $rootScope.step;
+	var max = $rootScope.max;
+
+	console.log('width', width);
+	console.log('height', height);
 	var c = document.getElementById('myCanvas');
 	var ctx = c.getContext('2d');
+	c.width = width;
+	c.height = height;
 
 	var xStart = -2;
 	var xEnd = 2;
 	var xStep = step;
 
-	var yStart = -2;
-	var yEnd = 2;
+	var xWidth = xEnd - xStart;
+
+	var yCenter = 0;
+	var yStart = yCenter - 0.5 * xWidth * height / width;
+	var yEnd = yCenter + 0.5 * xWidth * height / width;
 	var yStep = step;
 
+
+	var yHeight = yEnd - yStart;
+
 	function scaleX(x) {
-		return (x - xStart) * width / (xEnd - xStart);
+		return (x - xStart) * width / xWidth;
 	}
 
 	function scaleY(y) {
-		return (y - yStart) * width / (yEnd - yStart);
+		return (y - yStart) * height / yHeight;
 	}
-	var pixelX = width / xStep;
-	var pixelY = height / yStep;
+
+	var pixelX = Math.ceil(width / xStep);
+	var pixelY = Math.ceil(height / yStep);
 
 	for (var i = 0; i < xStep; i++) {
 		for (var j = 0; j < yStep; j++) {
@@ -36,24 +69,22 @@ function main() {
 			var x = xStart + i * (xEnd - xStart) / xStep;
 			var y = yStart + j * (yEnd - yStart) / yStep;
 			var z = new Complex(x, y);
-			var suite = new Suite(z);
-			var luminosity = suite.getColor();
+			var suite = new Suite(z, max);
+			var type = suite.getType();
 
-			var color = 'blue';
-			if (luminosity) {
-				color = 'blue';
+			var color = 'white';
+			if (type === -1) {
+				color = 'black';
 			} else {
-				color = 'red';
+				color = 'hsla(' + Math.ceil(type * 360/max) + ', 100%, 50%, 1)';
 			}
 			ctx.fillStyle = color;
 
 			ctx.fillRect(scaleX(x), scaleY(y), pixelX, pixelY);
-			//console.log('done for', i, j, x, y, scaleX(x), scaleY(y), color);
+			// console.log('done for', i, j, x, y, scaleX(x), scaleY(y), color);
 		}
 
 	}
 	ctx.stroke();
+	console.log('canva done');
 };
-
-
-main();
