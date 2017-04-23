@@ -17,7 +17,7 @@ export default class Suite {
 	getType() {
 		for (var i = 0; i < this.max; i++) {
 			this.increment();
-			if (this.current.module() > 2) {
+			if (this.current.module2() > 4) {
 				return i;
 			}
 

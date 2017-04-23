@@ -2,6 +2,7 @@
 
 import Complex from './Complex.js';
 import Suite from './Suite.js';
+import Timer from './Timer.js';
 
 import 'jquery';
 import 'angular';
@@ -11,11 +12,12 @@ app.run(function($rootScope, $window, $document) {
 	'ngInject';
 
 	function onresize() {
+		console.log('onresize', arguments);
 		var width = $(window).width();
-		var height = $(window).height() - 100;
+		var height = $(window).height() - 150;
 		var s = {
-			xStart: -2,
-			xEnd: 2,
+			xStart: -2.2,
+			xEnd: 0.8,
 			width: width,
 			height: height,
 			step: 400,
@@ -28,6 +30,7 @@ app.run(function($rootScope, $window, $document) {
 
 		$rootScope.s = s;
 		console.log('$rootScope.s', $rootScope.s.width);
+		$rootScope.$apply();
 	};
 
 	$window.onresize = onresize;
@@ -45,8 +48,7 @@ app.run(function($rootScope, $window, $document) {
 			console.log('wheel event down: zoom in');
 			zoom(s, e, 1);
 		}
-		main(s);
-
+		$rootScope.$apply();
 	});
 
 	var startX = 0;
@@ -79,9 +81,8 @@ app.run(function($rootScope, $window, $document) {
 	}
 
 	$rootScope.$watch('s', function() {
-		setTimeout(() => {
-			main($rootScope.s);
-		}, 500);
+		console.log('watch s', $rootScope.s);
+		main($rootScope.s);
 	}, true);
 
 });
@@ -98,6 +99,8 @@ function main(s) {
 	console.log('width', s.width);
 	console.log('height', s.height);
 	var c = document.getElementById('myCanvas');
+	c.width = s.width;
+	c.height = s.height;
 	var ctx = c.getContext('2d');
 	ctx.clearRect(0, 0, c.width, c.height);
 
@@ -115,16 +118,18 @@ function main(s) {
 	var pixelX = Math.ceil(s.width / xStep);
 	var pixelY = Math.ceil(s.height / yStep);
 
+	var t = new Timer();
+
 	for (var i = 0; i < xStep; i++) {
 		for (var j = 0; j < yStep; j++) {
 
-			var x = s.xStart + i * (s.xEnd - s.xStart) / xStep;
-			var y = s.yStart + j * (s.yEnd - s.yStart) / yStep;
+			var x = s.xStart + i * (s.xWidth) / xStep;
+			var y = s.yStart + j * (s.yHeight) / yStep;
 			var z = new Complex(x, y);
 			var suite = new Suite(z, s.max);
 			var type = suite.getType();
 
-			var color = 'white';
+			var color;
 			if (type === -1) {
 				color = 'black';
 			} else {
@@ -139,7 +144,7 @@ function main(s) {
 
 	}
 	ctx.stroke();
-	console.log('canva done');
+	console.log('canva done', t.getTime());
 };
 
 function zoom(s, e, coef) {

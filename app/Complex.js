@@ -11,7 +11,7 @@ export default class Complex {
 	static multiply(u, v) {
 		return new Complex(u.x * v.x - u.y * v.y, u.x * v.y + u.y * v.x);
 	}
-	module() {
+	module2() {
 		return this.x * this.x + this.y * this.y;
 	}
 }
