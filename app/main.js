@@ -7,47 +7,86 @@ import 'jquery';
 import 'angular';
 
 var app = angular.module('main', []);
-app.run(function($rootScope) {
+app.run(function($rootScope, $window, $document) {
 	'ngInject';
-	var s = {
-		xStart: -2,
-		xEnd: 2,
-		width: $(window).width(),
-		height: $(window).height() - 100,
-		step: 400,
-		max: 50
-	};
-	s.xWidth = s.xEnd - s.xStart;
-	s.yStart = -0.5 * s.xWidth * s.height / s.width;
-	s.yEnd = 0.5 * s.xWidth * s.height / s.width;
-	s.yHeight = s.yEnd - s.yStart;
 
-	console.log('$(h1).height()', $('h1').height());
-	$rootScope.s = s;
-	console.log('$rootScope.s', $rootScope.s.width);
+	function onresize() {
+		var width = $(window).width();
+		var height = $(window).height() - 100;
+		var s = {
+			xStart: -2,
+			xEnd: 2,
+			width: width,
+			height: height,
+			step: 400,
+			max: 50
+		};
+		s.xWidth = s.xEnd - s.xStart;
+		s.yStart = -0.5 * s.xWidth * s.height / s.width;
+		s.yEnd = 0.5 * s.xWidth * s.height / s.width;
+		s.yHeight = s.yEnd - s.yStart;
+
+		$rootScope.s = s;
+		console.log('$rootScope.s', $rootScope.s.width);
+	};
+
+	$window.onresize = onresize;
+	onresize();
 
 
 	$('canvas').bind('mousewheel', function(e) {
 		e.preventDefault();
 		console.log('wheel event', arguments);
+		var s = $rootScope.s;
 		if (e.originalEvent.wheelDelta / 120 > 0) {
 			console.log('wheel event up: zoom out', e.offsetX, e.offsetY);
-			zoom(s, e, 1);
+			zoom(s, e, -1);
 		} else {
 			console.log('wheel event down: zoom in');
-			zoom(s, e, -1);
+			zoom(s, e, 1);
 		}
 		main(s);
 
 	});
 
+	var startX = 0;
+	var startY = 0;
+	var x = 0;
+	var y = 0;
+
+	$('canvas').on('mousedown', function(event) {
+		console.log('mousedown');
+		event.preventDefault();
+		startX = event.pageX;
+		startY = event.pageY;
+
+		$document.on('mousemove', mousemove);
+		$document.on('mouseup', mouseup);
+	});
+
+	function mousemove(event) {
+		y = event.pageY - startY;
+		x = event.pageX - startX;
+	}
+
+	function mouseup() {
+		console.log('mouseup');
+		$document.off('mousemove', mousemove);
+		$document.off('mouseup', mouseup);
+		move($rootScope.s, x, y);
+		console.log('$rootScope', $rootScope);
+		$rootScope.$apply();
+	}
+
 	$rootScope.$watch('s', function() {
 		setTimeout(() => {
-			main(s);
-		}, 0);
+			main($rootScope.s);
+		}, 500);
 	}, true);
 
 });
+
+
 
 angular.element(() => {
 	angular.bootstrap(document, ['main']);
@@ -62,14 +101,8 @@ function main(s) {
 	var ctx = c.getContext('2d');
 	ctx.clearRect(0, 0, c.width, c.height);
 
-
-
-
 	var xStep = s.step;
 	var yStep = s.step;
-
-
-
 
 	function scaleX(x) {
 		return Math.ceil((x - s.xStart) * s.width / s.xWidth);
@@ -100,6 +133,7 @@ function main(s) {
 			ctx.fillStyle = color;
 
 			ctx.fillRect(scaleX(x), scaleY(y), pixelX, pixelY);
+			ctx.stroke();
 			// console.log('done for', i, j, x, y, scaleX(x), scaleY(y), color);
 		}
 
@@ -126,6 +160,16 @@ function zoom(s, e, coef) {
 
 	s.xStart = x - xR * s.xWidth;
 	s.yStart = y - yR * s.yHeight;
+
+	s.xEnd = s.xStart + s.xWidth;
+	s.yEnd = s.yStart + s.yHeight;
+
+}
+
+function move(s, x, y) {
+	console.log('move', arguments);
+	s.xStart -= x * s.xWidth / s.width;
+	s.yStart -= y * s.yHeight / s.height;
 
 	s.xEnd = s.xStart + s.xWidth;
 	s.yEnd = s.yStart + s.yHeight;
