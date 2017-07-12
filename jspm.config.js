@@ -48,8 +48,7 @@ System.config({
     },
     "npm:buffer@5.0.6": {
       "base64-js": "npm:base64-js@1.2.0",
-      "ieee754": "npm:ieee754@1.1.8",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
+      "ieee754": "npm:ieee754@1.1.8"
     },
     "npm:core-js@1.2.7": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",

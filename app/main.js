@@ -3,6 +3,7 @@
 import Complex from './Complex.js';
 import Suite from './Suite.js';
 import Timer from './Timer.js';
+import Settings from './Settings.js';
 
 import 'jquery';
 import 'angular';
@@ -13,23 +14,11 @@ app.run(function($rootScope, $window, $document) {
 
 	function onresize() {
 		console.log('onresize', arguments);
-		var width = $(window).width();
-		var height = $(window).height() - 150;
-		var s = {
-			xStart: -2.2,
-			xEnd: 0.8,
-			width: width,
-			height: height,
-			step: 400,
-			max: 50
-		};
-		s.xWidth = s.xEnd - s.xStart;
-		s.yStart = -0.5 * s.xWidth * s.height / s.width;
-		s.yEnd = 0.5 * s.xWidth * s.height / s.width;
-		s.yHeight = s.yEnd - s.yStart;
+
+		var s = new Settings();
+
 
 		$rootScope.s = s;
-		console.log('$rootScope.s', $rootScope.s.width);
 		$rootScope.$apply();
 	};
 

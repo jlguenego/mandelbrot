@@ -7,10 +7,20 @@
 	<body>
 		<table>
 			<tr>
-				<td><h1>Mandelbrot example</h1></td>
+				<td>Mandelbrot example</td>
 				<td>
-					Iterations:&nbsp;<input type="number" ng-model="s.max" ng-model-options="{debounce: 500 }"/><br/>
-					Resolution: &nbsp;<input type="number" ng-model="s.step" ng-model-options="{debounce: 500 }" /><br/>
+					Iterations:&nbsp;<button ng-click="s.decMax()">-</button>{{s.max}}<button ng-click="s.incMax()">+</button><br/>
+					Resolution: &nbsp;{{s.step}}<br/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					xStart: {{s.xStart}}<br/>
+					xEnd: {{s.xEnd}}
+				</td>
+				<td>
+					yStart:&nbsp;{{s.yStart}}<br/>
+					yEnd: &nbsp;{{s.yEnd}}<br/>
 				</td>
 			</tr>
 		</table>
